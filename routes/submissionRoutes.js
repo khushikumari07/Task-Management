@@ -1,25 +1,18 @@
 const express = require('express');
-const {
-  createSubmission,
-  getSubmissionsByAssignmentId,
-  getSubmissionById,
-  gradeSubmission,
-  deleteSubmission,
-  getAllSubmissions,
-} = require('../controllers/submissionController');
-const { validateSubmission, validateGrading } = require('../middleware/validation');
-const { protect, authorize } = require('../middleware/auth');
-
 const router = express.Router();
+const User = require('../models/User');
 
-// All submission routes require authentication
-router.use(protect);
+// Create user
+router.post('/', async (req, res) => {
+  const user = new User(req.body);
+  await user.save();
+  res.json(user);
+});
 
-router.post('/', validateSubmission, authorize('student'), createSubmission);
-router.get('/', getAllSubmissions);
-router.get('/assignment/:assignmentId', getSubmissionsByAssignmentId);
-router.get('/:submissionId', getSubmissionById);
-router.put('/:id', authorize('teacher', 'admin'), validateGrading, gradeSubmission);
-router.delete('/:id', authorize('teacher', 'admin', 'student'), deleteSubmission);
+// Get all users
+router.get('/', async (req, res) => {
+  const users = await User.find();
+  res.json(users);
+});
 
 module.exports = router;
