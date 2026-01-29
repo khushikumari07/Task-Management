@@ -1,25 +1,18 @@
 const express = require('express');
-const {
-  registerUser,
-  loginUser,
-  getAllUsers,
-  getUserById,
-  updateUser,
-  deleteUser,
-} = require('../controllers/userController');
-const { validateUserRegistration } = require('../middleware/validation');
-const { protect } = require('../middleware/auth');
-
 const router = express.Router();
+const User = require('../models/User');
 
-// Public routes
-router.post('/register', validateUserRegistration, registerUser);
-router.post('/login', loginUser);
+// Create user
+router.post('/', async (req, res) => {
+  const user = new User(req.body);
+  await user.save();
+  res.json(user);
+});
 
-// Protected routes
-router.get('/', protect, getAllUsers);
-router.get('/:id', protect, getUserById);
-router.put('/:id', protect, updateUser);
-router.delete('/:id', protect, deleteUser);
+// Get all users
+router.get('/', async (req, res) => {
+  const users = await User.find();
+  res.json(users);
+});
 
 module.exports = router;
