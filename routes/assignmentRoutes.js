@@ -1,23 +1,18 @@
 const express = require('express');
-const {
-  createAssignment,
-  getAllAssignments,
-  getAssignmentById,
-  updateAssignment,
-  deleteAssignment,
-} = require('../controllers/assignmentController');
-const { validateAssignment } = require('../middleware/validation');
-const { protect, authorize } = require('../middleware/auth');
-
 const router = express.Router();
+const User = require('../models/User');
 
-// All assignment routes require authentication
-router.use(protect);
+// Create user
+router.post('/', async (req, res) => {
+  const user = new User(req.body);
+  await user.save();
+  res.json(user);
+});
 
-router.post('/', validateAssignment, authorize('teacher', 'admin'), createAssignment);
-router.get('/', getAllAssignments);
-router.get('/:id', getAssignmentById);
-router.put('/:id', authorize('teacher', 'admin'), updateAssignment);
-router.delete('/:id', authorize('teacher', 'admin'), deleteAssignment);
+// Get all users
+router.get('/', async (req, res) => {
+  const users = await User.find();
+  res.json(users);
+});
 
 module.exports = router;
